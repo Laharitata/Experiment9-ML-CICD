@@ -1,0 +1,48 @@
+
+name: ML CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  ml-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn joblib
+
+      - name: Test Dataset
+        run: |
+          python -c "import pandas as pd; df=pd.read_csv('kidney_cleaned.csv'); assert not df.empty; assert 'classification' in df.columns; print('Dataset test passed')"
+
+      - name: Retrain Machine Learning Model
+        run: |
+          python ml_pipeline.py
+
+      - name: Run Model Tests
+        run: |
+          python test_pipeline.py
+
+      - name: Simulate Model Deployment
+        run: |
+          echo "Model deployment started"
+          echo "Model deployment completed successfully"
+
+      - name: CI-CD Pipeline Completed
+        run: |
+          echo "CI-CD pipeline executed successfully"
